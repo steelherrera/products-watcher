@@ -49,7 +49,9 @@ jobs:
         run: mv code.zip terraform/aws
       
       - name: Download tf state
-        run: aws s3 cp s3://products-watcher-data/dev/terraform.tfstate terraform.tfstate
+        run: echo 'aws s3 cp s3://awstfstates/wom/prod/osm/terraform.tfstate terraform.tfstate \nif [ $? -eq 0 ]; then \necho "File exists" \nelse \necho "File does not exist"\nfi' > terraform_pre_init.sh
+      - run: sh terraform_pre_init.sh
+      - run: rm terraform_pre_init.sh
         
       - name: Terraform Init
         run: terraform init

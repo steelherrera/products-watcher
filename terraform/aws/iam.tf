@@ -16,6 +16,6 @@ resource "aws_iam_role" "IAM_ROLE_PRODUCTS_WATCHER_LAMBDA" {
 
 resource "aws_iam_policy_attachment" "attachPermissions" {
     name       = "policy_attachment_products_watcher_lambda"
-    roles      = ["${aws_iam_role.IAM_ROLE_IAM_ROLE_PRODUCTS_WATCHER_LAMBDARETRY_ACTIVATOR_LAMBDA.name}"]
+    roles      = ["${aws_iam_role.IAM_ROLE_PRODUCTS_WATCHER_LAMBDA.name}"]
     policy_arn = "${aws_iam_policy.iam_for_lambda.arn}"
 }

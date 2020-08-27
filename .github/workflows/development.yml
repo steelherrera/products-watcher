@@ -50,20 +50,29 @@ jobs:
       - name: Move zip code to upload folder
         run: mv code.zip terraform/aws
       
+      - name: Show directory
+        run: ls
+
       - name: Cd into terraform folder
         run: cd terraform/aws
       
+      - name: Show directory
+        run: ls
+        
       - name: Download tf state
         run: aws s3 cp s3://products-watcher-data/dev/terraform.tfstate terraform.tfstate || echo "Failed"
-        
+      
+      - name: Show directory
+        run: ls
+      
       - name: Terraform Init
         run: terraform init
 
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -input=false
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -input=false
       
       - name: Update tf state
         run: aws s3 cp terraform.tfstate s3://products-watcher-data/dev/terraform.tfstate

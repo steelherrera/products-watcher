@@ -11,6 +11,8 @@ jobs:
   ci:
     name: Test Project
     runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -39,7 +41,7 @@ jobs:
       - name: Clean dependencies
         run: rm -rf ./node_modules
 
-      - name: Istall deploy dependencies
+      - name: Install deploy dependencies
         run: npm i --only=prod
       
       - name: Generate zip code
@@ -52,9 +54,13 @@ jobs:
         run: echo -e 'aws s3 cp s3://products-watcher-data/dev/terraform.tfstate terraform.tfstate \nif [ $? -eq 0 ]; then \necho "File exists" \nelse \necho "File does not exist"\nfi' > terraform_pre_init.sh
       - run: sh terraform_pre_init.sh
       - run: rm terraform_pre_init.sh
+      - run: aws s3 cp s3://products-watcher-data/dev/terraform.tfstate terraform.tfstate || echo "Failed"
         
       - name: Terraform Init
         run: terraform init
+
+      - name: Show directory
+        run: ls
 
       - name: Terraform Plan
         run: terraform plan

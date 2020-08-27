@@ -1,0 +1,65 @@
+---
+name: Products Watch CI
+on:
+  push:
+    branches:
+      - development
+  pull_request:
+    branches:
+      - development
+jobs:
+  ci:
+    name: Test Project
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Node Build
+        uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+
+      - name: Configure AWS credentials from Test account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.TEST_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.TEST_AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+
+      - name: Clean and install dependencies
+        run: npm ci
+
+      - name: Run project tests
+        run: npm test
+      
+      - name: Clean dependencies
+        run: rm -rf ./node_modules
+
+      - name: Istall deploy dependencies
+        run: npm i --only=prod
+      
+      - name: Generate zip code
+        run: zip -rq code.zip * -x terraform/**\*
+
+      - name: Move zip code to upload folder
+        run: mv code.zip terraform/aws
+      
+      - name: Download tf state
+        run: aws s3 cp s3://products-watcher-data/dev/terraform.tfstate terraform.tfstate
+        
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+      
+      - name: Update tf state
+        run: aws s3 cp terraform.tfstate s3://products-watcher-data/dev/terraform.tfstate
+...

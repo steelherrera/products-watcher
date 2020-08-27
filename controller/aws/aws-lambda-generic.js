@@ -7,7 +7,6 @@ exports.handler = (event, context) => {
             //TODO
             resolve();
         }catch(exc){
-            Logger.logError("Error: "+Utils.getExceptionString(exc));
             reject(exc);
         }        
     });    

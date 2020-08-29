@@ -1,5 +1,5 @@
 ---
-name: Products Watch CI
+name: Products Watch CI/CD
 on:
   push:
     branches:
@@ -8,7 +8,7 @@ on:
     branches:
       - development
 jobs:
-  ci:
+  ci_cd:
     name: Test Project
     runs-on: ubuntu-latest
     env:
@@ -31,6 +31,8 @@ jobs:
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 0.13.0
 
       - name: Clean and install dependencies
         run: npm ci
